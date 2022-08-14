@@ -1,0 +1,11 @@
+# for api
+Flask               == 2.2.2
+ujson               == 4.1.0
+urllib3             == 1.26.6
+PyJWT               == 2.1.0
+attrs               == 20.3.0
+
+#db
+psycopg2-binary     >= 2.8.5
+yoyo-migrations     == 7.3.2
+peewee              == 3.14.4
