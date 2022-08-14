@@ -1,0 +1,16 @@
+# pycharm
+.idea
+.pytest_cache
+venv
+
+# build
+build
+*.egg-info
+dist
+
+# Others
+__pycache__
+temp
+geckodriver.log
+logs
+.env
