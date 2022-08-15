@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -20,6 +23,7 @@ def like_post(post_id: int):
     user_login = get_jwt_identity()
     user = um.select(um.id).where(um.login == user_login).dicts().first()
     post = pm.select(pm.id).where(pm.id == post_id).first()
+    um.modify_user(user["id"], last_request=datetime.now())
     if user and post:
         lm.add_like(user["id"], post_id)
         return jsonify(message=f"You liked a post #{post_id}"), 201
@@ -31,5 +35,6 @@ def like_post(post_id: int):
 def unlike_post(post_id: int):
     user_login = get_jwt_identity()
     user = um.select(um.id).where(um.login == user_login).dicts().first()
+    um.modify_user(user["id"], last_request=datetime.now())
     lm.delete_like(user["id"], post_id)
     return jsonify(message=f"You unliked a post #{post_id}"), 201

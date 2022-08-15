@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -20,5 +22,6 @@ def create_post():
     title = request.json["title"]
     text = request.json["text"]
     user = um.select(um.id).where(um.login == user_login).dicts().first()
+    um.modify_user(user["id"], last_request=datetime.now())
     pm.add_post(title, text, user["id"])
     return jsonify(message="You added a post"), 201

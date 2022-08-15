@@ -46,11 +46,12 @@ class LikesModel(BaseModel):
 
     @classmethod
     def get_likes_for_period(cls, date_from: datetime, date_to: datetime):
-        dates = [date_from + timedelta(days=x) for x in range((date_to - date_from).days)]
+        dates = [date_from + timedelta(days=x) for x in range((date_to - date_from).days + 1)]
         res_data = []
 
         for date in dates:
             likes_amount = cls.select().where(cls.creation_date == date).count()
+            print(likes_amount)
             data = {
                 "day": date.strftime("%m/%d/%Y"),
                 "likes": likes_amount
@@ -66,7 +67,7 @@ class LikesModel(BaseModel):
             last_row_id = cls.insert(
                 user_id=user_id,
                 post_id=post_id,
-                creation_date=datetime.now()
+                creation_date=datetime.now().date()
             ).execute()
             return last_row_id
         except DataError:
