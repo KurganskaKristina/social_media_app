@@ -14,8 +14,11 @@ def get_analytics():
     if not (date_from and date_to):
         return jsonify(message=f"Input a period"), 400
 
-    date_from_datetime = datetime.strptime(date_from, '%m/%d/%y')
-    date_to_datetime = datetime.strptime(date_to, '%m/%d/%y')
+    try:
+        date_from_datetime = datetime.strptime(date_from, '%m/%d/%y')
+        date_to_datetime = datetime.strptime(date_to, '%m/%d/%y')
+    except ValueError:
+        return jsonify(message="Wrong query parameters data."), 400
 
     res_data = lm.get_likes_for_period(date_from_datetime, date_to_datetime)
     return jsonify(res_data), 200

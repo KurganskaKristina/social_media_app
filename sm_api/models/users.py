@@ -39,7 +39,8 @@ class UsersModel(BaseModel):
     def get_user(cls, login: str = None, user_id: int = None) -> Optional[dict]:
         if login is None and user_id is None:
             return
-        query = cls.select().where(cls.login == login) if user_id is None else cls.select().where(cls.user_id == user_id)
+        query = cls.select().where(cls.login == login) if user_id is None else cls.select().where(
+            cls.user_id == user_id)
         return query.dicts().first()
 
     @classmethod

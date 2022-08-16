@@ -3,7 +3,6 @@ from playhouse.pool import PooledPostgresqlExtDatabase
 
 from sm_api.settings import DATABASE
 
-
 db = PooledPostgresqlExtDatabase(
     DATABASE["database"],
     host=DATABASE["host"],

@@ -4,6 +4,7 @@ ujson               == 4.1.0
 urllib3             == 1.26.6
 PyJWT               == 2.1.0
 attrs               == 20.3.0
+Werkzeug            == 2.2.2
 
 #db
 psycopg2-binary     >= 2.8.5

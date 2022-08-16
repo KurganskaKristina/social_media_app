@@ -9,6 +9,5 @@ jwt = JWTManager(app)
 
 from sm_api.api.resources import users, posts, likes, analytics
 
-
 if __name__ == '__main__':
     app.run()

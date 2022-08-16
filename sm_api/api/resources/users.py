@@ -4,19 +4,21 @@ from flask import jsonify, request, json
 from flask_jwt_extended import create_access_token
 
 from sm_api.api.app import app
+from sm_api.api.utils import check_dict_attr
+from sm_api.api.validators import UserRegisterDataValidator, UserLoginDataValidator
 from sm_api.models.users import UsersModel as um
 
 
 @app.route('/api/register', methods=['POST'])
 def register_user():
-    login = request.json['login']
-    user = um.get_user(login=login)
+    data = json.loads(request.data)
+    valid_data = check_dict_attr(UserRegisterDataValidator, data, "Invalid data to register a user")
+    user = um.get_user(login=valid_data.login)
 
     if user is not None:
         return jsonify(message="The login already exists."), 409
 
-    data = json.loads(request.data)
-    um.add_user(data['first_name'], data['last_name'], login, data['password'])
+    um.add_user(valid_data.first_name, valid_data.last_name, valid_data.login, valid_data.password)
 
     return jsonify(message="User registered successfully."), 201
 
@@ -24,7 +26,8 @@ def register_user():
 @app.route('/api/login', methods=['POST'])
 def login_user():
     data = json.loads(request.data)
-    user = um.get_registered_user(data['login'], data['password'])
+    valid_data = check_dict_attr(UserLoginDataValidator, data, "Invalid data to login a user")
+    user = um.get_registered_user(valid_data.login, valid_data.password)
 
     if user:
         um.modify_user(user["id"], last_login=datetime.now(), last_request=datetime.now())
@@ -36,12 +39,17 @@ def login_user():
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
-    amount = request.args.get('amount')
-    users = um.get_users(amount)
-    return jsonify(users), 200
+    try:
+        amount = request.args.get('amount')
+        users = um.get_users(amount)
+        return jsonify(users), 200
+    except ValueError:
+        return jsonify(message="Wrong query parameters data."), 400
 
 
 @app.route('/api/users/<int:user_id>/activity', methods=['GET'])
 def get_user_activity(user_id: int):
     users = um.get_user_activity(user_id)
-    return jsonify(users), 200
+    if users:
+        return jsonify(users), 200
+    return jsonify(message="User can't be found"), 400
