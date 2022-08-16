@@ -1,4 +1,3 @@
-from typing import List, Optional
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
@@ -29,6 +28,7 @@ class LikesModel(BaseModel):
         return cls.select().count()
 
     @classmethod
+    @db.atomic()
     def get_likes(cls, user_id: int = None):
         res_data = {
             "likes": [],
@@ -45,18 +45,17 @@ class LikesModel(BaseModel):
         return res_data
 
     @classmethod
+    @db.atomic()
     def get_likes_for_period(cls, date_from: datetime, date_to: datetime):
         dates = [date_from + timedelta(days=x) for x in range((date_to - date_from).days + 1)]
         res_data = []
 
         for date in dates:
             likes_amount = cls.select().where(cls.creation_date == date).count()
-            print(likes_amount)
-            data = {
+            res_data.append({
                 "day": date.strftime("%m/%d/%Y"),
                 "likes": likes_amount
-            }
-            res_data.append(data)
+            })
 
         return res_data
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import jsonify, request
+from flask import jsonify, request, json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from sm_api.api.app import app
@@ -19,9 +19,8 @@ def get_posts():
 @jwt_required()
 def create_post():
     user_login = get_jwt_identity()
-    title = request.json["title"]
-    text = request.json["text"]
-    user = um.select(um.id).where(um.login == user_login).dicts().first()
+    data = json.loads(request.data)
+    user = um.get_user(login=user_login)
     um.modify_user(user["id"], last_request=datetime.now())
-    pm.add_post(title, text, user["id"])
+    pm.add_post(data["title"], data["text"], user["id"])
     return jsonify(message="You added a post"), 201

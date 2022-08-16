@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 from dataclasses import dataclass
 
@@ -31,6 +31,15 @@ class PostsModel(BaseModel):
         return cls.select().count()
 
     @classmethod
+    @db.atomic()
+    def get_post(cls, post_id: int) -> Optional[dict]:
+        if post_id is None:
+            return
+        post = cls.select(cls.id).where(cls.id == post_id).first()
+        return post
+
+    @classmethod
+    @db.atomic()
     def get_posts(cls, user_id: int = None):
         res_data = {
             "posts": [],

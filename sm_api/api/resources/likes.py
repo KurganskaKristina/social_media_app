@@ -21,12 +21,15 @@ def get_likes():
 @jwt_required()
 def like_post(post_id: int):
     user_login = get_jwt_identity()
-    user = um.select(um.id).where(um.login == user_login).dicts().first()
-    post = pm.select(pm.id).where(pm.id == post_id).first()
+    user = um.get_user(login=user_login)
+    post = pm.get_post(post_id)
     um.modify_user(user["id"], last_request=datetime.now())
     if user and post:
-        lm.add_like(user["id"], post_id)
-        return jsonify(message=f"You liked a post #{post_id}"), 201
+        like_id = lm.add_like(user["id"], post_id)
+        if like_id:
+            return jsonify(message=f"You liked a post #{post_id}"), 201
+        else:
+            return jsonify(message=f"You have already liked a post #{post_id} before"), 400
     return jsonify(message=f"You can't like a post"), 400
 
 
@@ -34,7 +37,9 @@ def like_post(post_id: int):
 @jwt_required()
 def unlike_post(post_id: int):
     user_login = get_jwt_identity()
-    user = um.select(um.id).where(um.login == user_login).dicts().first()
+    user = um.get_user(login=user_login)
     um.modify_user(user["id"], last_request=datetime.now())
-    lm.delete_like(user["id"], post_id)
-    return jsonify(message=f"You unliked a post #{post_id}"), 201
+    if lm.delete_like(user["id"], post_id):
+        return jsonify(message=f"You unliked a post #{post_id}"), 201
+    else:
+        return jsonify(message=f"You have already unliked a post #{post_id} before"), 400

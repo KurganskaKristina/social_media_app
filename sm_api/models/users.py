@@ -35,6 +35,21 @@ class UsersModel(BaseModel):
         return cls.select().count()
 
     @classmethod
+    @db.atomic()
+    def get_user(cls, login: str = None, user_id: int = None) -> Optional[dict]:
+        if login is None and user_id is None:
+            return
+        query = cls.select().where(cls.login == login) if user_id is None else cls.select().where(cls.user_id == user_id)
+        return query.dicts().first()
+
+    @classmethod
+    @db.atomic()
+    def get_registered_user(cls, login, password) -> Optional[dict]:
+        user = cls.select(cls.id).where(cls.login == login, cls.password == password).dicts().first()
+        return user
+
+    @classmethod
+    @db.atomic()
     def get_users(cls, amount: int = None) -> Optional[List[dict]]:
         if amount is None:
             amount = cls.length()
@@ -43,6 +58,7 @@ class UsersModel(BaseModel):
         return res_data
 
     @classmethod
+    @db.atomic()
     def get_user_activity(cls, user_id: int) -> Optional[dict]:
         data = cls.select(cls.id, cls.last_login, cls.last_request).where(cls.id == user_id).dicts().first()
         return data
